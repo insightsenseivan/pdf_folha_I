@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2ebf91">
+  <title>TrHUB | Manual Folha de Pagamentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; --neon: #eaff00; --neon-soft: #f4ff8a; font-family: "Ubuntu", sans-serif; font-weight: 300; }
+    html, body, button, a, input, textarea, select { font-family: "Ubuntu", sans-serif; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center; overflow: hidden;
+      color: #fff; background: #8360c3;
+      background: -webkit-linear-gradient(to right, #2ebf91, #8360c3);
+      background: linear-gradient(to right, #2ebf91, #8360c3);
+    }
+    body::before, body::after { content: ""; position: fixed; width: 34rem; height: 34rem; border-radius: 50%; filter: blur(2px); pointer-events: none; }
+    body::before { top: -17rem; left: -12rem; background: radial-gradient(circle, #d3fff277, transparent 68%); }
+    body::after { right: -14rem; bottom: -19rem; background: radial-gradient(circle, #f1d4ff66, transparent 68%); }
+    .card {
+      position: relative; width: min(92vw, 570px); padding: clamp(28px, 6vw, 54px);
+      border: 1px solid #ffffff55; border-radius: 28px; text-align: center;
+      background: #ffffff1c; box-shadow: 0 24px 80px #1d174133, inset 0 1px #ffffff55;
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+    }
+    .mark { display: grid; place-items: center; width: 62px; height: 62px; margin: 0 auto 22px; border: 1px solid var(--neon); border-radius: 20px; background: #eaff001c; color: var(--neon); font-size: 27px; box-shadow: 0 0 24px #eaff0033, 0 8px 28px #0002; }
+    .eyebrow { margin: 0 0 10px; color: var(--neon); font-size: 12px; font-weight: 300; letter-spacing: .19em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(28px, 6vw, 42px); letter-spacing: -.045em; line-height: 1.12; }
+    .subtitle { max-width: 390px; margin: 16px auto 30px; color: #ffffffd9; font-size: 15px; line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .myButton {
+      box-shadow: inset 0 1px 0 #fce2c1; background: linear-gradient(to bottom, #ffc477 5%, #fb9e25 100%); background-color: #ffc477;
+      border-radius: 6px; border: 1px solid #eeb44f; display: inline-block; cursor: pointer; color: #fff;
+      font-family: "Ubuntu", sans-serif; font-size: 15px; font-weight: 300; padding: 10px 24px; text-decoration: none;
+      text-shadow: 0 1px 0 #cc9f52; transition: transform .2s, box-shadow .2s;
+    }
+    .myButton:hover { background: linear-gradient(to bottom, #fb9e25 5%, #ffc477 100%); background-color: #fb9e25; transform: translateY(-2px); box-shadow: 0 0 18px #eaff0055, inset 0 1px 0 #fce2c1; }
+    .myButton:active { position: relative; top: 1px; transform: none; }
+    .myButton:focus-visible { outline: 3px solid var(--neon); outline-offset: 3px; }
+    .fineprint { margin: 23px 0 0; color: #ffffffb8; font-size: 12px; }
+    .overlay { position: fixed; inset: 0; z-index: 5; display: none; place-items: center; padding: 18px; background: #11182775; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .overlay.open { display: grid; }
+    .dialog { width: min(94vw, 850px); height: min(82vh, 680px); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #ffffff66; border-radius: 22px; background: #f7f8fc; color: #172033; box-shadow: 0 30px 100px #0b102966; animation: appear .22s ease-out; }
+    @keyframes appear { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+    .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; background: #fff; border-bottom: 1px solid #e7eaf0; }
+    .dialog-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 300; }
+    .close { flex: 0 0 38px; width: 38px; min-height: 38px; padding: 0; border: 0; border-radius: 12px; background: #edf0f5; color: #334155; font-family: "Ubuntu", sans-serif; font-size: 22px; font-weight: 300; cursor: pointer; }
+    .readme-content { width: 100%; flex: 1; overflow: auto; padding: clamp(24px, 5vw, 48px); background: #fff; }
+    .readme-content h2 { margin: 0 0 18px; color: #172033; font-size: 26px; font-weight: 300; }
+    .readme-content p { color: #475569; font-size: 15px; line-height: 1.7; }
+    .readme-content a, .fallback a { color: #347c76; font-weight: 300; }
+    .fallback { padding: 14px 18px; border-top: 1px solid #e7eaf0; color: #475569; font-size: 13px; }
+    .loading { z-index: 10; text-align: center; }
+    .loading-card { width: min(90vw, 410px); padding: 36px 28px; border: 1px solid #ffffff60; border-radius: 24px; background: #ffffff20; box-shadow: 0 24px 80px #1d174144; backdrop-filter: blur(24px); }
+    .spinner { width: 54px; height: 54px; margin: 0 auto 22px; border: 4px solid #ffffff4a; border-top-color: var(--neon); border-radius: 50%; box-shadow: 0 0 20px #eaff0044; animation: spin .85s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading h2 { margin: 0; font-size: 20px; line-height: 1.35; }
+    .loading p { margin: 10px 0 0; color: #ffffffd4; font-size: 14px; }
+    .progress { height: 5px; margin-top: 24px; overflow: hidden; border-radius: 9px; background: #ffffff45; }
+    .progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--neon); box-shadow: 0 0 14px #eaff00; transition: width 10s linear; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="mark" aria-hidden="true">✦</div>
+    <p class="eyebrow">TrHUB · Central de documentos</p>
+    <h1>Manual Folha de Pagamentos</h1>
+    <p class="subtitle">Acesse o arquivo de referência ou baixe o manual em PDF. Tudo pronto em poucos instantes.</p>
+    <div class="actions">
+      <a href="#" class="myButton" id="openReadme">Abrir arquivo README</a>
+      <a href="#" class="myButton" id="download">↓ &nbsp; Manual Folha (PDF)</a>
+    </div>
+    <p class="fineprint">Documento de apoio · TrHUB</p>
+  </main>
+
+  <section class="overlay" id="readmeModal" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog">
+      <div class="dialog-head"><div class="dialog-title" id="dialogTitle">README.md — pdf_folha_I</div><button class="close" type="button" aria-label="Fechar">×</button></div>
+      <article class="readme-content">
+        <h2>pdf_folha_I</h2>
+        <p>O README apresenta o título do projeto. Acesse o manual em PDF pelo link abaixo.</p>
+        <p><a href="https://raw.githubusercontent.com/insightsenseivan/pdf_folha_I/7023e8ecfa8c5ed53512a41e526ca2a2a64962b3/Passo%20a%20Passo%20Folha%20I%20-%20Configura%C3%A7%C3%B5es-%20Dom%C3%ADnio.pdf" target="_blank" rel="noopener">Abrir o PDF do manual</a></p>
+      </article>
+      <div class="fallback">Ver o arquivo original: <a href="https://github.com/insightsenseivan/pdf_folha_I/blob/7023e8ecfa8c5ed53512a41e526ca2a2a64962b3/README.md" target="_blank" rel="noopener">README.md no GitHub</a>.</div>
+    </div>
+  </section>
+
+  <section class="overlay loading" id="loading" role="status" aria-live="polite" aria-label="Preparando download">
+    <div class="loading-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>TrHUB | Manual Folha de Pagamentos</h2>
+      <p>Preparando seu PDF…</p>
+      <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    </div>
+  </section>
+
+  <script>
+    const modal = document.getElementById('readmeModal');
+    const loading = document.getElementById('loading');
+    const pdfUrl = 'https://raw.githubusercontent.com/insightsenseivan/pdf_folha_I/7023e8ecfa8c5ed53512a41e526ca2a2a64962b3/Passo%20a%20Passo%20Folha%20I%20-%20Configura%C3%A7%C3%B5es-%20Dom%C3%ADnio.pdf';
+    document.getElementById('openReadme').addEventListener('click', (event) => { event.preventDefault(); modal.classList.add('open'); document.querySelector('.close').focus(); });
+    document.querySelector('.close').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (event) => { if (event.target === modal) modal.classList.remove('open'); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { modal.classList.remove('open'); loading.classList.remove('open'); } });
+    document.getElementById('download').addEventListener('click', (event) => {
+      event.preventDefault();
+      if (loading.classList.contains('open')) return;
+      // Reserve the tab while the user gesture is active; navigate it after the 10-second loader.
+      const pdfTab = window.open('about:blank', '_blank');
+      loading.classList.add('open');
+      const bar = document.getElementById('progressBar');
+      requestAnimationFrame(() => { bar.style.width = '100%'; });
+      window.setTimeout(() => {
+        loading.classList.remove('open');
+        bar.style.transition = 'none'; bar.style.width = '0';
+        requestAnimationFrame(() => { bar.style.transition = 'width 10s linear'; });
+        if (pdfTab && !pdfTab.closed) pdfTab.location.href = pdfUrl;
+        else window.location.href = pdfUrl;
+      }, 10000);
+    });
+  </script>
+</body>
+</html>
